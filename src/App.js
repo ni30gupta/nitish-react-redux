@@ -1,24 +1,35 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import ProductPage from "./pages/ProductPage";
+import axios from "axios";
+import { setCategories, setProducts } from "./actions";
 
 function App() {
+  const dispatch = useDispatch();
+  const [productList, setProductList] = useState([]);
+
+  React.useEffect(() => {
+    callProductAPI();
+  }, []);
+
+  const callProductAPI = () => {
+    axios
+      .get("https://aveosoft-react-assignment.herokuapp.com/products")
+      .then((resp) => {
+        dispatch(setProducts(resp.data));
+        setProductList(resp.data);
+      });
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomePage productList={productList} />} />
+        <Route path="product/:id" element={<ProductPage />} />
+      </Routes>
+    </Router>
   );
 }
 
